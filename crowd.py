@@ -652,6 +652,48 @@ class CrowdServer(object):
             memberships[group] = {u'users': users, u'groups': groups}
         return memberships
 
+    def add_group(self, name, description):
+        session = self._build_session()
+        session.headers.update({'Content-Type': 'application/json'})
+        session.headers.update({'Accept': 'application/json'})
+
+        payload = {
+            "type": "GROUP",
+            "name": name,
+            "description": description,
+            "active": "true",
+        }
+
+        response = session.post(self.rest_url + "/group", data=json.dumps(payload), timeout=self.timeout)
+        return(response.json())
+
+    def delete_group(self, name):
+        session = self._build_session()
+        session.headers.update({'Content-Type': 'application/json'})
+        session.headers.update({'Accept': 'application/json'})
+
+        params = {
+            "groupname": name
+        }
+
+        response = session.delete(self.rest_url + "/group", params=params, timeout=self.timeout)
+        return(response.status_code)
+
+    def get_all_groups(self):
+        """Performs a group search using the Crowd Search API:
+        https://docs.atlassian.com/atlassian-crowd/3.4.0/REST/?_ga=2.64325867.516426529.1555336166-1463240010.1554907493#usermanagement/1/search
+
+        Args: 
+            None
+        """
+
+        session = self._build_session()
+        session.headers.update({'Accept': 'application/json'})
+        response = session.get(self.rest_url + "/search?entity-type=group")
+        
+        return(json.loads(response.text))
+
+
     def search(self, entity_type, property_name, search_string, start_index=0, max_results=99999):
         """Performs a user search using the Crowd search API.
 
@@ -721,6 +763,7 @@ class CrowdServer(object):
         session = self._build_session(content_type='xml')
         session.headers.update({'Accept': 'application/json'})
         response = session.post(self.rest_url + "/search", params=params, data=payload, timeout=self.timeout)
+
 
         if not response.ok:
             return None
