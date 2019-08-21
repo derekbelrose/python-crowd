@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('') {
       steps {
-        sh 'echo "mother do you think she\'s good enough....for me?"'
+        sh 'echo "Mother do you think she\'s dangerous, for me?"'
       }
     }
   }
